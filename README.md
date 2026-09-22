@@ -200,6 +200,28 @@ happens in a single view.
 `[dev, prod]`, producing the jobs **API E2E - dev** and **API E2E - prod**, followed by a
 **Merged API E2E report** job.
 
+### Running the pipeline
+
+The workflow triggers automatically on every push to `main` and on every pull request, and
+can also be started on demand through `workflow_dispatch`. Nothing has to be installed or
+configured to review it:
+
+1. Open the [Actions tab](https://github.com/josequinterosdet/user-management-api-e2e/actions).
+   Every run is public, with complete job logs for both environments.
+2. Open any run and download the **`api-report`** artifact from the summary page. Unzip it
+   and open `index.html` to get the merged report for `dev` and `prod`.
+
+Starting a new run requires write access, which GitHub does not grant to visitors of a
+public repository. To trigger one, either fork the repository, enable Actions in the fork
+and use the **Run workflow** button, or request collaborator access here.
+
+The pipeline needs no secrets: the application under test is a public container image that
+each job starts on its own runner.
+
+The same verification runs locally with the commands in
+[Getting started](#getting-started); CI adds nothing beyond executing both environments in
+parallel and merging their reports.
+
 - Each environment job runs on its own `ubuntu-latest` runner and starts its own container,
   so the environments never share state.
 - `fail-fast: false` guarantees that a failure in one environment never cancels the other,
