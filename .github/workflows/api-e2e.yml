@@ -1,0 +1,120 @@
+name: API E2E
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  API_IMAGE: ghcr.io/danielsilva-loanpro/sdet-interview-challenge:c08f5d2302641206704023d0c36af6b89ff85724
+  API_CONTAINER: user-management-api
+
+jobs:
+  api-e2e:
+    name: API E2E - ${{ matrix.environment }}
+    runs-on: ubuntu-latest
+    strategy:
+      # Keep dev and prod independent: a failure in one environment must never
+      # cancel the other, so both always produce results.
+      fail-fast: false
+      matrix:
+        environment: [dev, prod]
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check the test suite
+        run: npm run typecheck
+
+      - name: Start the User Management API
+        run: |
+          docker run --detach \
+            --name "$API_CONTAINER" \
+            --publish 3000:3000 \
+            "$API_IMAGE"
+
+      - name: Wait for the API to accept requests
+        run: |
+          for attempt in $(seq 1 60); do
+            if curl --silent --fail "http://127.0.0.1:3000/${{ matrix.environment }}/users" > /dev/null; then
+              echo "API is ready after ${attempt} attempt(s)."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "The API did not become available within the allowed time."
+          docker logs "$API_CONTAINER"
+          exit 1
+
+      # The blob reporter is an intermediate format that the merge job turns
+      # into one combined HTML report. `list` keeps the job log readable.
+      - name: Run the API test suite
+        run: npm run test:${{ matrix.environment }} -- --reporter=blob,list
+
+      - name: Print API container logs
+        if: failure()
+        run: docker logs "$API_CONTAINER"
+
+      - name: Upload the blob report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-${{ matrix.environment }}
+          path: blob-report/
+          retention-days: 1
+
+      - name: Remove the API container
+        if: always()
+        run: docker rm --force "$API_CONTAINER"
+
+  merged-report:
+    name: Merged API E2E report
+    runs-on: ubuntu-latest
+    # Always run: the environment jobs are expected to fail while the product
+    # bugs in BUGS.md remain open, and the report is still required.
+    if: always()
+    needs: [api-e2e]
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Each environment produces a distinctly named blob (report-dev.zip and
+      # report-prod.zip), so flattening them into one directory is collision-free.
+      - name: Download the blob report of every environment
+        uses: actions/download-artifact@v4
+        with:
+          path: blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
+
+      - name: Merge both environments into a single HTML report
+        run: npx playwright merge-reports --config playwright.config.ts blob-reports
+
+      - name: Upload the merged HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-report
+          path: playwright-report/
+          retention-days: 14

@@ -1,0 +1,25 @@
+{
+  "name": "user-management-api-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "API end-to-end test suite for the User Management API, covering the dev and prod environments with Playwright Test.",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "playwright test",
+    "test:dev": "playwright test --project=dev",
+    "test:prod": "playwright test --project=prod",
+    "test:list": "playwright test --list --reporter=list",
+    "report": "playwright show-report"
+  },
+  "keywords": [
+    "api",
+    "e2e",
+    "playwright",
+    "typescript"
+  ],
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.2",
+    "typescript": "^7.0.2"
+  }
+}

@@ -1,0 +1,21 @@
+node_modules/
+
+# Playwright output.
+# `playwright-report/` is intentionally NOT ignored: the challenge requires the
+# generated testing report to be part of the repository deliverables.
+test-results/
+blob-report/
+playwright/.cache/
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+
+# Logs and OS noise
+*.log
+.DS_Store
+Thumbs.db
+
+# Local-only AI agent instructions, not part of the challenge deliverable.
+AGENTS.md

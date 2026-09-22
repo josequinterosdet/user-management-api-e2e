@@ -1,0 +1,10 @@
+# Normalize line endings so the repository stays consistent across Windows,
+# macOS, Linux and the GitHub Actions runners.
+* text=auto eol=lf
+
+# Keep the lockfile byte-for-byte stable.
+package-lock.json text eol=lf
+
+# The Playwright HTML report is a generated deliverable: exclude it from diffs
+# and from GitHub language statistics.
+playwright-report/** linguist-generated=true -diff
