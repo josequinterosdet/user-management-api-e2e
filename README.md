@@ -1,7 +1,13 @@
 # User Management API — E2E Test Suite
 
+[![API E2E](https://github.com/josequinterosdet/user-management-api-e2e/actions/workflows/api-e2e.yml/badge.svg)](https://github.com/josequinterosdet/user-management-api-e2e/actions/workflows/api-e2e.yml)
+
 End-to-end API test suite for the **User Management API** SDET challenge, written with
 [Playwright Test](https://playwright.dev/docs/api-testing) and TypeScript.
+
+> The badge above reports **failing** on purpose. The suite asserts the documented
+> OpenAPI contract, and the application under test violates it in four places, so the
+> `dev` and `prod` jobs stay red until those defects are fixed. See [`BUGS.md`](./BUGS.md).
 
 A single suite runs unchanged against both documented environments, `dev` and `prod`, and
 validates the application against the authoritative OpenAPI specification in
