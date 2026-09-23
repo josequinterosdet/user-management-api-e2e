@@ -84,6 +84,7 @@ docker rm --force user-management-api
 │   ├── support/users.ts            # API client, fixtures, data builders, schema assertions
 │   ├── users.spec.ts               # CRUD, validation and authentication coverage
 │   └── environment-isolation.spec.ts
+├── scripts/pin-report-theme.mjs    # Keeps the generated report readable on dark systems
 ├── playwright.config.ts            # dev and prod projects, HTML reporter
 ├── sdet_challenge_api.yml          # Authoritative OpenAPI specification
 ├── BUGS.md                         # Confirmed specification violations
@@ -176,6 +177,17 @@ last execution and nothing else.
 
 Inside the report, `p:dev` or `p:prod` in the search box filters a combined report down to
 a single environment, and clicking a badge does the same.
+
+### Theme
+
+The report has no configuration option for its theme and falls back to the operating
+system preference, so the same deliverable renders light for one reviewer and dark for the
+next. [`scripts/pin-report-theme.mjs`](./scripts/pin-report-theme.mjs) removes that
+variance by seeding the report's own `theme` key before its bundle boots, both in
+`npm run report` and in the CI job that publishes the artifact.
+
+The seed is only written when the key is absent, so choosing a theme from the gear menu in
+the report still wins and survives reloads.
 
 ### In CI: two isolated runs, one merged report
 

@@ -9,7 +9,7 @@
     "test:dev": "playwright test --project=dev",
     "test:prod": "playwright test --project=prod",
     "test:list": "playwright test --list --reporter=list",
-    "report": "playwright show-report"
+    "report": "node scripts/pin-report-theme.mjs && playwright show-report"
   },
   "keywords": [
     "api",

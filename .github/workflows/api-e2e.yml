@@ -111,6 +111,11 @@ jobs:
       - name: Merge both environments into a single HTML report
         run: npx playwright merge-reports --config playwright.config.ts blob-reports
 
+      # The report has no configuration option for its theme and defaults to the
+      # operating system preference, so the artifact is pinned to light mode.
+      - name: Pin the report theme
+        run: node scripts/pin-report-theme.mjs
+
       - name: Upload the merged HTML report
         if: always()
         uses: actions/upload-artifact@v4
