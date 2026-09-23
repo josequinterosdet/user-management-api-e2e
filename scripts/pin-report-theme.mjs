@@ -6,14 +6,30 @@ const indexFile = path.join(reportDir, 'index.html');
 
 const MARKER = 'data-pinned-theme';
 
-// The report reads `localStorage.theme` when it boots and falls back to the operating
-// system preference, which renders the deliverable in dark mode on most machines.
+// The report stores `system` as its default theme and resolves it through
+// `matchMedia('(prefers-color-scheme: dark)')`, so the deliverable renders dark on any
+// machine configured that way. Reporting no dark preference to that single query is
+// enough to make `system` resolve to light.
 //
-// A first visit makes the report store `system` on its own, so an absent key and that
-// value both mean "no preference expressed" and are the only cases overwritten here.
-// An explicit `light-mode` or `dark-mode` chosen from the report UI is left untouched.
-const SNIPPET =
-  `<script ${MARKER}>try{var t=localStorage.getItem("theme");if(!t||t==="system")localStorage.setItem("theme","light-mode")}catch{}</script>`;
+// The alternatives are worse: seeding `localStorage` is lost wherever storage is
+// unavailable, and rewriting the class on `<html>` loses a race against the effect that
+// re-applies the theme after mount. Neither problem exists here, and an explicit choice
+// made in the report UI is still honoured because it never reaches the query.
+const SNIPPET = [
+  `<script ${MARKER}>`,
+  '(function(){',
+  'var native=window.matchMedia;',
+  'if(typeof native!=="function")return;',
+  'window.matchMedia=function(query){',
+  'query=String(query);',
+  'if(!/prefers-color-scheme\\s*:\\s*dark/i.test(query))return native.call(window,query);',
+  'return{media:query,matches:false,onchange:null,',
+  'addEventListener:function(){},removeEventListener:function(){},',
+  'addListener:function(){},removeListener:function(){},',
+  'dispatchEvent:function(){return false}}};',
+  '})()',
+  '</script>',
+].join('');
 
 // The report bundle is a module script and therefore deferred. A classic inline script
 // placed before it is guaranteed to run first.

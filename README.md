@@ -180,14 +180,15 @@ a single environment, and clicking a badge does the same.
 
 ### Theme
 
-The report has no configuration option for its theme and falls back to the operating
-system preference, so the same deliverable renders light for one reviewer and dark for the
-next. [`scripts/pin-report-theme.mjs`](./scripts/pin-report-theme.mjs) removes that
-variance by seeding the report's own `theme` key before its bundle boots, both in
-`npm run report` and in the CI job that publishes the artifact.
+The report has no configuration option for its theme. It defaults to `System` and resolves
+that through `prefers-color-scheme`, so the same deliverable renders light for one reviewer
+and dark for the next. [`scripts/pin-report-theme.mjs`](./scripts/pin-report-theme.mjs)
+removes the variance by making that one media query report no dark preference before the
+report bundle boots, both in `npm run report` and in the CI job that publishes the
+artifact.
 
-The seed is only written when the key is absent, so choosing a theme from the gear menu in
-the report still wins and survives reloads.
+`System` therefore resolves to light, while `Dark mode` and `Light mode` chosen from the
+gear menu behave exactly as before.
 
 ### In CI: two isolated runs, one merged report
 
