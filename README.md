@@ -197,28 +197,18 @@ a single environment, and clicking a badge does the same.
 
 ### Opening the report
 
-Serve the report instead of opening `index.html` from the file system:
+| What you have | How to open it |
+| --- | --- |
+| A local run | `npm run report` |
+| The `api-report` artifact | Unzip it, then `npx playwright show-report <folder>` |
 
-```bash
-npx playwright show-report path/to/playwright-report
-```
+Serving matters: the evidence attached to each failure is fetched from `data/`, and
+browsers block `fetch` on `file://`. Double-clicking `index.html` still renders the
+summary, but that evidence stays unreachable.
 
-The evidence attached to each failing test lives in `playwright-report/data/` and the
-report loads those files with `fetch`, which browsers refuse to perform on a `file://`
-page. Double-clicking `index.html` therefore renders the run summary but leaves the
-attached evidence unreachable. Serving the directory, which is also what `npm run report`
-does, keeps the whole report usable.
-
-### Theme
-
-The report ships with no theme baked in. The gear menu offers `Dark mode`, `Light mode`
-and `System`, and the default is `System`, which means the colors come from the reviewing
-machine's own `prefers-color-scheme` setting. The same report therefore looks light on one
-machine and dark on another, and the choice is remembered per browser.
-
-Only the background and text colors change. Both themes keep the reporter's status
-palette, red for failures and green for passes, and both keep the per-project badge, so no
-information depends on the theme in use.
+The theme is not baked in. The default is `System`, so colors follow the reviewer's
+`prefers-color-scheme` and the same report looks light on one machine and dark on another;
+the gear menu switches it. Status colors are identical in both themes.
 
 ### In CI: two isolated runs, one merged report
 
