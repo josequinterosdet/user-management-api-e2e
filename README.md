@@ -55,6 +55,24 @@ curl --fail http://localhost:3000/dev/users
 curl --fail http://localhost:3000/prod/users
 ```
 
+### The whole review in one paste
+
+Running the suite locally is the most direct way to review it, and it reproduces exactly
+what CI publishes. The container is removed before the report opens, because the report is
+a static page that needs nothing running behind it:
+
+```bash
+npm ci
+docker run --detach --name user-management-api --publish 3000:3000 \
+  ghcr.io/danielsilva-loanpro/sdet-interview-challenge:c08f5d2302641206704023d0c36af6b89ff85724
+npm test
+docker rm --force user-management-api
+npm run report
+```
+
+`npm test` exits non-zero on purpose: 8 of the 56 tests document real defects, listed in
+[Known bugs](#known-bugs). `npm run report` serves the result and opens it in a browser.
+
 ## Commands
 
 | Command | Purpose |
@@ -243,9 +261,9 @@ and use the **Run workflow** button, or request collaborator access here.
 The pipeline needs no secrets: the application under test is a public container image that
 each job starts on its own runner.
 
-The same verification runs locally with the commands in
-[Getting started](#getting-started); CI adds nothing beyond executing both environments in
-parallel and merging their reports.
+Reviewing the run on GitHub is optional. The same verification runs locally with
+[the whole review in one paste](#the-whole-review-in-one-paste), and CI adds nothing beyond
+executing both environments in parallel and merging their reports.
 
 - Each environment job runs on its own `ubuntu-latest` runner and starts its own container,
   so the environments never share state.
