@@ -97,15 +97,15 @@ docker rm --force user-management-api
 
 ```text
 .
-├── .github/workflows/api-e2e.yml   # Parallel dev and prod pipeline
+├── .github/workflows/api-e2e.yml       # Parallel dev and prod pipeline
 ├── tests/
-│   ├── support/users.ts            # API client, fixtures, data builders, schema assertions
-│   ├── users.spec.ts               # CRUD, validation and authentication coverage
-│   └── environment-isolation.spec.ts
-├── playwright.config.ts            # dev and prod projects, HTML reporter
-├── sdet_challenge_api.yml          # Authoritative OpenAPI specification
-├── BUGS.md                         # Confirmed specification violations
-└── playwright-report/              # Generated HTML report (committed deliverable)
+│   ├── support/users.ts                # API client, fixtures, data builders, schema assertions
+│   ├── users.spec.ts                   # CRUD, validation and authentication coverage
+│   └── environment-isolation.spec.ts   # Proof that dev and prod never share data
+├── playwright.config.ts                # dev and prod projects, HTML reporter
+├── sdet_challenge_api.yml              # Authoritative OpenAPI specification
+├── BUGS.md                             # Confirmed specification violations
+└── playwright-report/                  # Generated HTML report (committed deliverable)
 ```
 
 ## Coverage
