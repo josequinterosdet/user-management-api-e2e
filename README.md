@@ -201,10 +201,16 @@ a single environment, and clicking a badge does the same.
 | --- | --- |
 | A local run | `npm run report` |
 | The `api-report` artifact | Unzip it, then `npx playwright show-report <folder>` |
+| The artifact, without Node at hand | Unzip it and open `index.html` in a browser |
 
-Serving matters: the evidence attached to each failure is fetched from `data/`, and
-browsers block `fetch` on `file://`. Double-clicking `index.html` still renders the
-summary, but that evidence stays unreachable.
+The first two serve the report, which is what the evidence attached to each failure needs:
+it is fetched from `data/`, and browsers block `fetch` on `file://`. Opening `index.html`
+directly still gives the full summary and every assertion error; only that attached
+evidence stays out of reach.
+
+> **Note.** A directly opened `index.html` also depends on the browser. Some Chrome setups
+> render it washed out, with the status colors and the project badges turned grey. If that
+> happens, open the same file in Firefox, Microsoft Edge or Safari.
 
 The theme is not baked in. The default is `System`, so colors follow the reviewer's
 `prefers-color-scheme` and the same report looks light on one machine and dark on another;
