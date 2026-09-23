@@ -84,7 +84,6 @@ docker rm --force user-management-api
 │   ├── support/users.ts            # API client, fixtures, data builders, schema assertions
 │   ├── users.spec.ts               # CRUD, validation and authentication coverage
 │   └── environment-isolation.spec.ts
-├── scripts/pin-report-theme.mjs    # Keeps the generated report readable on dark systems
 ├── playwright.config.ts            # dev and prod projects, HTML reporter
 ├── sdet_challenge_api.yml          # Authoritative OpenAPI specification
 ├── BUGS.md                         # Confirmed specification violations
@@ -178,17 +177,30 @@ last execution and nothing else.
 Inside the report, `p:dev` or `p:prod` in the search box filters a combined report down to
 a single environment, and clicking a badge does the same.
 
+### Opening the report
+
+Serve the report instead of opening `index.html` from the file system:
+
+```bash
+npx playwright show-report path/to/playwright-report
+```
+
+The evidence attached to each failing test lives in `playwright-report/data/` and the
+report loads those files with `fetch`, which browsers refuse to perform on a `file://`
+page. Double-clicking `index.html` therefore renders the run summary but leaves the
+attached evidence unreachable. Serving the directory, which is also what `npm run report`
+does, keeps the whole report usable.
+
 ### Theme
 
-The report has no configuration option for its theme. It defaults to `System` and resolves
-that through `prefers-color-scheme`, so the same deliverable renders light for one reviewer
-and dark for the next. [`scripts/pin-report-theme.mjs`](./scripts/pin-report-theme.mjs)
-removes the variance by making that one media query report no dark preference before the
-report bundle boots, both in `npm run report` and in the CI job that publishes the
-artifact.
+The report ships with no theme baked in. The gear menu offers `Dark mode`, `Light mode`
+and `System`, and the default is `System`, which means the colors come from the reviewing
+machine's own `prefers-color-scheme` setting. The same report therefore looks light on one
+machine and dark on another, and the choice is remembered per browser.
 
-`System` therefore resolves to light, while `Dark mode` and `Light mode` chosen from the
-gear menu behave exactly as before.
+Only the background and text colors change. Both themes keep the reporter's status
+palette, red for failures and green for passes, and both keep the per-project badge, so no
+information depends on the theme in use.
 
 ### In CI: two isolated runs, one merged report
 
